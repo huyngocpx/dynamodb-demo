@@ -1,5 +1,5 @@
 require 'aws-sdk'
-require './item_tags_dao'
+require './dynamo_dao'
 
 def is_integer(str)
   !!Integer(str)
@@ -18,7 +18,7 @@ Aws.config.update(
 )
 
 dynamodb_client = Aws::DynamoDB::Client.new
-dao_impl = ItemTagsDao.new(dynamodb_client)
+dynamo_dao = DynamoDao.new(dynamodb_client)
 table_name = "item_tags"
 
 begin
@@ -36,11 +36,11 @@ begin
 
   case gets.chomp
   when '1'
-    dao_impl.create_table(table_name)
+    dynamo_dao.create_table(table_name)
   when '2'
-    dao_impl.describe_table(table_name)
+    dynamo_dao.describe_table(table_name)
   when '3'
-    dao_impl.get_all_items(table_name)
+    dynamo_dao.get_all_items(table_name)
   when '4'
     keys = {}
     print "\nEnter item_id:\t"
@@ -48,9 +48,9 @@ begin
     print "\nEnter locale:\t"
     keys["locale"] = gets.chomp
 
-    dao_impl.find_by_key(table_name, keys)
+    dynamo_dao.find_by_key(table_name, keys)
   when '5'
-    dao_impl.query_items(table_name)
+    dynamo_dao.query_items(table_name)
   when '6'
     # input from user
     print "\nEnter new item_id:\t"
@@ -70,7 +70,7 @@ begin
         attributes["item_id"] = item_id.to_i
         attributes["locale"] = locale
         attributes["is_origin"] = is_origin.to_i unless is_origin.empty?
-        dao_impl.put_item(table_name, attributes)
+        dynamo_dao.put_item(table_name, attributes)
       else
         puts "is_origin is not a valid integer"
       end
@@ -89,7 +89,7 @@ begin
     is_origin = gets.chomp
 
     if is_integer(is_origin)
-      dao_impl.update_item(table_name, keys, is_origin.to_i)
+      dynamo_dao.update_item(table_name, keys, is_origin.to_i)
     else
       puts "is_origin is not a valid integer"
     end
@@ -101,9 +101,9 @@ begin
     print "\nEnter locale needed to delete:\t"
     keys["locale"] = gets.chomp
 
-    dao_impl.delete_item(table_name, keys)
+    dynamo_dao.delete_item(table_name, keys)
   when '9'
-    dao_impl.delete_table(table_name)
+    dynamo_dao.delete_table(table_name)
   else
     puts "Not valid option"
   end

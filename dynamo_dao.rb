@@ -1,4 +1,6 @@
-class ItemTagsDao
+class DynamoDao
+  ATTRIBUTE_TYPE = { "S" => "String", "N" => "Number", "B" => "Binary"}
+
   def initialize(dynamodb_client)
     @dynamodb_client = dynamodb_client
   end
@@ -60,7 +62,7 @@ class ItemTagsDao
           write_capacity_units: 25,
         },
       )
-      puts "Create item_tags successfully!"
+      puts "Create #{table_name} successfully!"
     end
   end
 
@@ -203,19 +205,13 @@ class ItemTagsDao
   end
 
   private
+
   def display_table(table)
     puts "============================================="
     puts "Name: #{table.table_name}"
     puts "Atributes:"
     table.attribute_definitions.each do |attribute|
-      if attribute.attribute_type == 'S'
-        type = 'String'
-      elsif attribute.attribute_type == 'N'
-        type = "Number"
-      else # B
-        type = "Binary"
-      end
-      puts "\t#{attribute.attribute_name} - #{type}"
+      puts "\t#{attribute.attribute_name} - #{ATTRIBUTE_TYPE[attribute.attribute_type]}"
     end
     puts "Keys: #{table.key_schema.map(&:attribute_name).join(', ')}"
     puts "============================================="
