@@ -1,0 +1,49 @@
+# new client
+client = Aws::DynamoDB::Client.new
+
+# create table
+client.create_table
+  table_name, attribute_definitions (attribute_name, attribute_type), key_schema (), global_secondary_indexes, provisioned_throughput
+
+  ** attribute_type
+  ** S: string
+  ** N: number
+  ** B: binary
+
+# insert row
+client.put_item
+  table_name, item
+
+# select a row by primary key
+client.get_item
+  table_name, key
+  projection_expression/expression_attribute_names (#name)
+
+# select multiple rows
+client.query
+  table_name
+  projection_expression/expression_attribute_names (#name) => use to get particular columns and avoid reserved names of dynamodb
+  key_condition_expression/expression_attribute_values (:name)
+  filter_expression/expression_attribute_value (:name), after querying, before returning
+
+# select all rows
+client.scan
+  table_name
+
+# update row
+client.update_item
+  table_name, key
+  attribute_updates ( value, action)
+
+  ** action
+  ** PUT
+  ** ADD
+  ** DELETE
+
+# delete row
+client.delete_item
+  table_name, key
+
+# delete table
+client.delete_table
+  table_name
